@@ -33,8 +33,6 @@ if 'install' in argv or 'develop' in argv:
             print '%sCould not move old settings file.%s' % (bcolors.FAIL, bcolors.ENDC)
             exit(0)
 
-
-
     with open('%s/versionchecker/versionchecker_settings.template.py' % file_path) as f:
         lines = f.readlines()
         with open(settings_filename, 'w') as w:
@@ -50,7 +48,7 @@ setup(
     install_requires=[
         'pyquery>=1.2.8',
         'requests>=2.3.0',
-        'parsers>=0.0.1'
+        'parsers>=0.0.2'
     ],
     entry_points={
         'console_scripts': [
@@ -58,13 +56,16 @@ setup(
         ]
     },
     dependency_links=[
-        "git+ssh://git@github.com:eonlight/parsers.git",
+        "https://github.com/eonlight/parsers/tarball/master#egg=parsers-v0.0.2",
     ],
     author='Ruben de Campos',
     author_email='rcadima@gmail.com',
     description='Version Checker',
     keywords=['version', 'identifiers', 'audits'],
-    long_description=""" Tool that checks a url for software and software versions and compares it to the most recent versions. """
+    long_description="""
+        Checks a URL for which software the server is running and its versions.
+        Gets the latest versions and reports the ones that are outdated.
+    """
 )
 
 print '%srun \'versionchecker --update\' to fetch the most current versions before running%s' % (bcolors.ENF, bcolors.ENDC)

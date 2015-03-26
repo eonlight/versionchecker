@@ -21,4 +21,4 @@ versions_info = {
     #return versions
 #
 
-DEBUG = True
+DEBUG = False
