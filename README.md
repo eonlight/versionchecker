@@ -3,16 +3,30 @@ Checks a URL for which software the server is running and its versions.
 
 Gets the latest versions and reports the ones that are outdated.
 
-## Instalation
+## Base Suported Software
 
-`pip install git+https://github.com/eonlight/versionchecker`
+* apache
+* nginx
+* microsoft-iis
+* joomla
+* wordpress
+* php
+* openssl
+* liferay
+* ipboard
+* vbulletin
+* mysql
+* lighttpd
+* postgre
+* drupal
+* tomcat
 
-or
+## Installation
 
 ```
 git clone https://github.com/eonlight/versionchecker
 cd versionchecker
-./setup install
+./setup.py install
 ```
 
 ## Configuration
