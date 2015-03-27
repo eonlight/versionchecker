@@ -23,6 +23,9 @@ Gets the latest versions and reports the ones that are outdated.
 
 ## Installation
 
+pip install git+https://github.com/eonlight/parsers
+pip install git+https://github.com/eonlight/versionchecker
+
 ```
 git clone https://github.com/eonlight/parsers
 cd parsers
@@ -49,21 +52,26 @@ cd versionchecker
 
 ## How it works
 
-* Starts by running WhatWeb against the provided URL
-* Uses parsers to get a json result from WhatWeb
-* Using the preloaded latest versions compares with the result from WhatWeb
+* Starts by running WhatWeb & NMap (and any other tool in the local settings) against the provided URL
+* Uses parsers to get a json result from WhatWeb & NMap
+* Using the preloaded latest versions compares with the result from the identified versions
 * Reports if the identified software is out-of-date or not
 
 ## Examples
 
 * Check the installed versions on https://www.github.com
 ```
-versionchecker --url https://www.github.com
+versionchecker https://www.github.com
 ```
 
 * Cherk the installed versions on https://www.github.com and get the result in json format
 ```
 versionchecker --json https://www.github.com
+```
+
+* Check the settings
+```
+versionchecker --settings
 ```
 
 ## To Do List
