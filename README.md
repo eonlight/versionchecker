@@ -23,8 +23,12 @@ Gets the latest versions and reports the ones that are outdated.
 
 ## Installation
 
+```
 pip install git+https://github.com/eonlight/parsers
 pip install git+https://github.com/eonlight/versionchecker
+```
+
+or
 
 ```
 git clone https://github.com/eonlight/parsers
@@ -76,12 +80,19 @@ versionchecker --settings
 
 ## To Do List
 
-* Add CVE verification feature
-    * Report as Out-Of-Date only if current version has known CVEs
+* Nothing
 
 ## Changelog
 
-### Version 0.1.0 (current)
+### Version 0.2.0 (current)
+
+* Adds Support for the CVE reporting
+    * In the report it will show if any and how many CVEs were found
+    * Requires a URL for each new software added in the configs.
+    * It reports both if it is out-of-date and if there are any CVEs
+* Checks for the latest versions file before running
+
+### Version 0.1.0
 
 * Adds Support to add your own software version identification
     * check the Configuration section

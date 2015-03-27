@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 from sys import stderr
 import traceback
+import os
 
 import settings
 
@@ -25,11 +26,12 @@ class VersionsParser():
             return
 
         try:
-            with open(self._versions_file, 'r') as f:
-                versions = f.read()
+            if os.path.exists(settings.versions_file):
+                with open(self._versions_file, 'r') as f:
+                    versions = f.read()
 
-            if versions:
-                self.latest_versions = loads(versions)
+                if versions:
+                    self.latest_versions = loads(versions)
 
         except (IOError, ValueError, Exception) as e:
             if settings.DEBUG:

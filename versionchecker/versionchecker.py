@@ -1,6 +1,7 @@
 from sys import argv, exit, stderr
 from datetime import datetime
 import traceback
+import os
 
 import requests
 import re
@@ -41,6 +42,10 @@ def merge_results(result, new_result):
 def test(url=None):
     if not url:
         return None
+
+    if not os.path.exists(settings.versions_file):
+        print 'Run %s%sversionchecker --update%s' % (bcolors.FAIL, bcolors.ENF, bcolors.END)
+        exit(0)
 
     versionsparser = VersionsParser()
 
@@ -100,11 +105,19 @@ def run(url):
             print 'Software: %s%s%s' % (bcolors.ENF, key, bcolors.END)
             print '  Version in use: %s' % result[key]['current']
             print '  Latest Version: %s' % result[key]['latest']
+
+            cve = '%sFound %s CVEs%s' % (bcolors.FAIL, result[key]['cve'], bcolors.END)
+            if result[key]['cve'] == None:
+                cve = '%sError Getting CVEs%s' % (bcolors.ENF, bcolors.END)
+            elif result[key]['cve'] == False or result[key]['cve'] == 0:
+                cve = '%sNot Found%s' % (bcolors.OK, bcolors.END)
+
+            print '  CVEs          : %s' % cve
             veredict = '  %sVersion not detected%s' % (bcolors.ENF, bcolors.END)
             if 'nok' == result[key]['result']:
                 veredict = '  %sOut-Of-Date%s' % (bcolors.FAIL, bcolors.END)
             elif 'ok' == result[key]['result']:
-                veredict = '  %smUp-To-Date%s' % (bcolors.OK, bcolors.END)
+                veredict = '  %sUp-To-Date%s' % (bcolors.OK, bcolors.END)
             print veredict
             print
 

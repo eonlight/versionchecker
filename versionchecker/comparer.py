@@ -1,8 +1,58 @@
 from datetime import datetime
+from pyquery import PyQuery
 from sys import stderr
 import traceback
 import settings
+import requests
 import re
+
+def cve_exists(software, version):
+    url = settings.versions_info[software]['cve-search']
+    try:
+        # this in a while loop
+        pq = PyQuery(requests.get(url).text)
+
+        try:
+            max_page = len(pq('.paging a'))+1
+        except (IndexError, Exception) as e:
+            if settings.DEBUG:
+                stderr.write(traceback.format_exc())
+            max_page = 2
+
+        for page in range(1, max_page):
+
+            # search page
+            for tr in pq('.listtable tr'):
+                cells = tr.findall('td')
+
+                if len(cells) < 2:
+                    continue
+
+                cve_count = cells[-2].text.strip()
+                cve_version = cells[0].text.strip()
+
+                if settings.DEBUG:
+                    print '%s - comparer - compare_versions - Comparing %s: %s with %s' % (str(datetime.now()), software, cve_version, version)
+
+                if add_zeros(cve_version) == add_zeros(version):
+                    return int(cve_count)
+                elif add_zeros(cve_version) < add_zeros(version):
+                    return False
+
+            # get next page
+            url = url.replace('/%s/' % str(page), '/%s/' % str(page+1))
+            pq = PyQuery(requests.get(url).text)
+
+            if settings.DEBUG:
+                print '%s - comparer - compare_versions - Getting Page %s' % (str(datetime.now()), url)
+
+    except (AttributeError, Exception) as e:
+        if settings.DEBUG:
+            stderr.write(traceback.format_exc())
+        stderr.write('%s - comparer - cve_exists - Request Error: %s\n' % (str(datetime.now()), e.message))
+        return None
+
+    return False
 
 def compare_versions(apps=None, versions=None):
     """ returns [{software: {current: X.X, latest: Y.Y, result: 'ok|nok'}}] """
@@ -21,13 +71,14 @@ def compare_versions(apps=None, versions=None):
         current = apps[software]
         latest = versions[software]
         status = 'ok'
+        cve = 'not found'
 
         # if current version not found
         if isinstance(current, dict) and 'version' not in current:
             current = ''
             if not isinstance(latest, list):
                 latest = [latest]
-            result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': status}})
+            result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': status, 'cve': cve}})
             continue
 
         # if version found
@@ -36,7 +87,9 @@ def compare_versions(apps=None, versions=None):
 
         # latest version not found
         if 'Regex Error' in latest:
-            result.update({software: {'current': current, 'latest': latest, 'result': status}})
+            if current:
+                cve = cve_exists(software, current)
+            result.update({software: {'current': current, 'latest': latest, 'result': status, 'cve': cve}})
             continue
 
         # current version not found
@@ -44,7 +97,7 @@ def compare_versions(apps=None, versions=None):
             current = ''
             if not isinstance(latest, list):
                 latest = [latest]
-            result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': status}})
+            result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': status, 'cve': cve}})
             continue
 
         #if whatweb finds a list, select the best one
@@ -69,8 +122,10 @@ def compare_versions(apps=None, versions=None):
                     stderr.write(traceback.format_exc())
                     print "%s - comparer - compare_versions - Current: %s" % (str(datetime.now()), current)
                     print "%s - comparer - compare_versions - Latest: %s" % (str(datetime.now()), latest)
-                result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': 'nok'}})
-                stderr.write('%s - comparer - compare_versions - Version Finding Error: %s\n' % (str(datetime.now()), e.message))
+                if current:
+                    cve = cve_exists(software, current)
+                result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': 'nok', 'cve': cve}})
+                #stderr.write('%s - comparer - compare_versions - Version Finding Error: %s\n' % (str(datetime.now()), e.message))
                 continue
             latest = tversion
         else:
@@ -79,9 +134,11 @@ def compare_versions(apps=None, versions=None):
         if add_zeros(current) < add_zeros(latest):
             status = 'nok'
 
+        cve = cve_exists(software, current)
+
         latest = list_latest
 
-        result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': status}})
+        result.update({software: {'current': current, 'latest': ', '.join(latest), 'result': status, 'cve': cve}})
 
     return result
 

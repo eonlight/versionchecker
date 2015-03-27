@@ -2,7 +2,7 @@ from sys import path, stderr
 from datetime import datetime
 import os
 
-version = '0.1.0'
+version = '0.2.0'
 
 tools_name = 'versionchecker'
 tools_folder = '%s/.config/audits' % os.getenv("HOME")
@@ -13,77 +13,92 @@ versions_info = {
     'apache':    {
         'url': 'http://httpd.apache.org/',
         'module': 'versionchecker.software_functions',
-        'function': 'apache'
+        'function': 'apache',
+        'cve-search': 'http://www.cvedetails.com/version-list/45/66/1/Apache-Http-Server.html',
     },
     'nginx':     {
         'url': 'http://nginx.org/en/CHANGES',
         'module': 'versionchecker.software_functions',
-        'function': 'nginx'
+        'function': 'nginx',
+        'cve-search': 'http://www.cvedetails.com/version-list/10048/17956/1/Nginx-Nginx.html',
     },
     'microsoft-iis':       {
         'url': 'http://www.iis.net/learn',
         'module': 'versionchecker.software_functions',
-        'function': 'iis'
+        'function': 'iis',
+        'cve-search': 'http://www.cvedetails.com/version-list/26/3436/1/Microsoft-IIS.html',
     },
     'joomla':    {
         'url': 'http://www.joomla.org/download.html',
         'module': 'versionchecker.software_functions',
-        'function': 'joomla'
+        'function': 'joomla',
+        'cve-search': 'http://www.cvedetails.com/version-list/3496/6129/1/Joomla-Joomla.html',
     },
     'wordpress': {
         'url': 'http://wordpress.org/download/',
         'module': 'versionchecker.software_functions',
-        'function': 'wordpress'
+        'function': 'wordpress',
+        'cve-search': 'http://www.cvedetails.com/version-list/2337/4096/1/Wordpress-Wordpress.html',
     },
     'php':       {
         'url': 'http://www.php.net/',
         'module': 'versionchecker.software_functions',
-        'function': 'php'
+        'function': 'php',
+        'cve-search': 'http://www.cvedetails.com/version-list/74/128/1/PHP-PHP.html',
     },
     'openssl':   {
         'url': 'http://www.openssl.org/source/',
         'module': 'versionchecker.software_functions',
-        'function': 'openssl'
+        'function': 'openssl',
+        'cve-search': 'http://www.cvedetails.com/version-list/217/383/1/Openssl-Openssl.html',
     },
     'liferay':   {
         'url': 'http://www.liferay.com/community/releases',
         'module': 'versionchecker.software_functions',
-        'function': 'liferay'
+        'function': 'liferay',
+        'cve-search': 'http://www.cvedetails.com/version-list/2114/18625/1/Liferay-Liferay-Portal.html',
     },
     'ipboard':   {
         'url': 'http://en.wikipedia.org/wiki/Invision_Power_Board',
         'module': 'versionchecker.software_functions',
-        'function': 'ipboard'
+        'function': 'ipboard',
+        'cve-search': 'http://www.cvedetails.com/version-list/10268/18333/1/Invisionpower-Invision-Power-Board.html',
     },
     'vbulletin': {
         'url': 'http://www.vbulletin.com/forum/external?type=rss2&nodeid=28',
         'module': 'versionchecker.software_functions',
-        'function': 'vbulletin'
+        'function': 'vbulletin',
+        'cve-search': 'http://www.cvedetails.com/version-list/8142/14110/1/Vbulletin-Vbulletin.html',
     },
     'mysql':     {
         'url': 'http://dev.mysql.com/downloads/',
         'module': 'versionchecker.software_functions',
-        'function': 'mysql'
+        'function': 'mysql',
+        'cve-search': 'http://www.cvedetails.com/version-list/185/316/1/Mysql-Mysql.html',
     },
     'lighttpd':  {
         'url': 'http://www.lighttpd.net/download/',
         'module': 'versionchecker.software_functions',
-        'function': 'lighttpd'
+        'function': 'lighttpd',
+        'cve-search': 'http://www.cvedetails.com/version-list/2713/4762/1/Lighttpd-Lighttpd.html',
     },
     'postgre':   {
         'url': 'http://www.postgresql.org/',
         'module': 'versionchecker.software_functions',
-        'function': 'postgre'
+        'function': 'postgre',
+        'cve-search': 'http://www.cvedetails.com/version-list/336/575/1/Postgresql-Postgresql.html',
     },
     'drupal':    {
         'url': 'https://www.drupal.org/download',
         'module': 'versionchecker.software_functions',
-        'function': 'drupal'
+        'function': 'drupal',
+        'cve-search': 'http://www.cvedetails.com/version-list/1367/2387/1/Drupal-Drupal.html',
     },
     'tomcat':    {
         'url': 'http://tomcat.apache.org/',
         'module': 'versionchecker.software_functions',
-        'function': 'tomcat'
+        'function': 'tomcat',
+        'cve-search': 'http://www.cvedetails.com/version-list/45/887/1/Apache-Tomcat.html',
     },
 }
 

@@ -11,7 +11,8 @@ versions_info = {
     #'my_software':    {
     #    'url': 'http://my-software.com/versions',
     #    'module': 'versionchecker_settings'
-    #    'function': 'my_software_scrapper'
+    #    'function': 'my_software_scrapper',
+    #    'cve-search': ''http://www.cvedetails.com/version-list/XXX/YYY/1/Vendor-Software.html'
     #},
 }
 
@@ -32,15 +33,15 @@ version_checking_tools = {
     },
     '9.nmap': {
         'module': 'parsers',
-        'class': 'NMapParser'
+        'class': 'NMapParser',
     },
     #'2.my_software': {
-    #    'module': 'versionchecker_settings'
-    #    'function': 'MySoftwareVersionChecker'
+    #    'module': 'versionchecker_settings',
+    #    'function': 'MySoftwareVersionChecker',
     #},
     #'1.other_checker': {
     #    'module': 'installed_module',
-    #   ''
+    #    'function': 'function',
     #}
 }
 
