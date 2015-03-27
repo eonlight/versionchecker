@@ -52,10 +52,8 @@ class VersionsParser():
                 continue
 
             try:
-                module_name = info['function'] if '.' not in info['function'] else info['function'].rsplit('.', 1)[0]
-                function_name = software if '.' not in info['function'] else info['function'].rsplit('.', 1)[1]
-                module = __import__(module_name, fromlist = [function_name])
-                function = getattr(module, function_name)
+                module = __import__(info['module'], fromlist = [info['function']])
+                function = getattr(module, info['function'])
                 version = function(response)
             except (AttributeError, Exception) as e:
                 if settings.DEBUG:

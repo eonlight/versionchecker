@@ -24,6 +24,10 @@ Gets the latest versions and reports the ones that are outdated.
 ## Installation
 
 ```
+git clone https://github.com/eonlight/parsers
+cd parsers
+./setup.py install
+cd ..
 git clone https://github.com/eonlight/versionchecker
 cd versionchecker
 ./setup.py install
@@ -37,7 +41,10 @@ cd versionchecker
 
 * Run `versionchecker --update' to update the lastest versions
 
-* You can add you're own functions to get tyhe latest versions of other software in:
+* You can add you're own functions to get the latest versions of other software in:
+    * `~/.config/audits/verisonchecker_settings.py'
+
+* You can also add you're one software to check for versions, check:
     * `~/.config/audits/verisonchecker_settings.py'
 
 ## How it works
@@ -61,6 +68,21 @@ versionchecker --json https://www.github.com
 
 ## To Do List
 
-* Add support for more version identification tools
 * Add CVE verification feature
     * Report as Out-Of-Date only if current version has known CVEs
+
+## Changelog
+
+### Version 0.1.0 (current)
+
+* Adds Support to add your own software version identification
+    * check the Configuration section
+* Refactors the latest software fetch functions
+* Adds more detailed information about errors or misconfigurations
+* Adds option to run without arguments
+* Improves setup with pre and post instalation scripts
+* Fixes some bugs
+
+### Version 0.0.1
+
+* First official release

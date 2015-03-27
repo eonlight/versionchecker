@@ -1,11 +1,16 @@
 #! /usr/bin/env python
+from setuptools.command.install import install
+from setuptools.command.develop import develop
 from setuptools import setup, find_packages
 from sys import argv
 import os
 
-version = '0.0.1'
+version = '0.1.0'
 home = os.getenv('HOME')
 file_path = os.path.realpath(__file__).rsplit('/', 1)[0]
+
+tools_folder = '%s/.config/audits' % home
+settings_filename = '%s/versionchecker_settings.py' % tools_folder
 
 class bcolors:
     FAIL = '\033[91m'
@@ -13,13 +18,10 @@ class bcolors:
     OK  = '\033[92m'
     ENDC = '\033[0m'
 
-tools_folder = '%s/.config/audits' % home
-settings_filename = '%s/versionchecker_settings.py' % tools_folder
-
-if 'install' in argv or 'develop' in argv:
+def common(debug=False):
     if not os.path.exists(tools_folder):
         try:
-            os.mkdir(tools_folder)
+            os.makedirs(tools_folder)
         except OSError:
             print '%sNo permission to create %s.%s' % (bcolors.FAIL, tools_folder, bcolors.ENDC)
             exit(0)
@@ -37,8 +39,20 @@ if 'install' in argv or 'develop' in argv:
         lines = f.readlines()
         with open(settings_filename, 'w') as w:
             for line in lines:
-                w.write(line.replace('{{ home }}', home).replace('{{ version }}', version))
+                w.write(line.replace('{{ home }}', home).replace('{{ version }}', version).replace('{{ debug }}', 'True' if debug else 'False'))
         print '%s%s created.%s' % (bcolors.OK, settings_filename, bcolors.ENDC)
+
+class PreInstall(install):
+    def run(self):
+        common(False)
+        install.run(self)
+        print '%srun \'versionchecker --update\' to fetch the most current versions before running%s' % (bcolors.ENF, bcolors.ENDC)
+
+class PreDevelop(develop):
+    def run(self):
+        common(True)
+        develop.run(self)
+        print '%srun \'versionchecker --update\' to fetch the most current versions before running%s' % (bcolors.ENF, bcolors.ENDC)
 
 setup(
     name="versionchecker",
@@ -48,7 +62,7 @@ setup(
     install_requires=[
         'pyquery>=1.2.8',
         'requests>=2.3.0',
-        'parsers>=0.0.2'
+        'parsers>=0.1.0'
     ],
     entry_points={
         'console_scripts': [
@@ -56,8 +70,12 @@ setup(
         ]
     },
     dependency_links=[
-        "https://github.com/eonlight/parsers/tarball/master#egg=parsers-v0.0.2",
+        "https://github.com/eonlight/parsers/tarball/master#egg=parsers-v0.1.0",
     ],
+    cmdclass={
+        'install': PreInstall,
+        'develop': PreDevelop,
+    },
     author='Ruben de Campos',
     author_email='rcadima@gmail.com',
     description='Version Checker',
@@ -67,5 +85,3 @@ setup(
         Gets the latest versions and reports the ones that are outdated.
     """
 )
-
-print '%srun \'versionchecker --update\' to fetch the most current versions before running%s' % (bcolors.ENF, bcolors.ENDC)

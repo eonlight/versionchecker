@@ -2,7 +2,7 @@ from sys import path, stderr
 from datetime import datetime
 import os
 
-version = '0.0.1'
+version = '0.1.0'
 
 tools_name = 'versionchecker'
 tools_folder = '%s/.config/audits' % os.getenv("HOME")
@@ -12,65 +12,90 @@ output_folder = '%s/output' % tools_folder
 versions_info = {
     'apache':    {
         'url': 'http://httpd.apache.org/',
-        'function': 'versionchecker.software_functions.apache'
+        'module': 'versionchecker.software_functions',
+        'function': 'apache'
     },
     'nginx':     {
         'url': 'http://nginx.org/en/CHANGES',
-        'function': 'versionchecker.software_functions.nginx'
+        'module': 'versionchecker.software_functions',
+        'function': 'nginx'
     },
     'microsoft-iis':       {
         'url': 'http://www.iis.net/learn',
-        'function': 'versionchecker.software_functions.iis'
+        'module': 'versionchecker.software_functions',
+        'function': 'iis'
     },
     'joomla':    {
         'url': 'http://www.joomla.org/download.html',
-        'function': 'versionchecker.software_functions.joomla'
+        'module': 'versionchecker.software_functions',
+        'function': 'joomla'
     },
     'wordpress': {
         'url': 'http://wordpress.org/download/',
-        'function': 'versionchecker.software_functions.wordpress'
+        'module': 'versionchecker.software_functions',
+        'function': 'wordpress'
     },
     'php':       {
         'url': 'http://www.php.net/',
-        'function': 'versionchecker.software_functions.php'
+        'module': 'versionchecker.software_functions',
+        'function': 'php'
     },
     'openssl':   {
         'url': 'http://www.openssl.org/source/',
-        'function': 'versionchecker.software_functions.openssl'
+        'module': 'versionchecker.software_functions',
+        'function': 'openssl'
     },
     'liferay':   {
         'url': 'http://www.liferay.com/community/releases',
-        'function': 'versionchecker.software_functions.liferay'
+        'module': 'versionchecker.software_functions',
+        'function': 'liferay'
     },
     'ipboard':   {
-        #'url': 'http://community.invisionpower.com/resources/documentation/versions.html',
         'url': 'http://en.wikipedia.org/wiki/Invision_Power_Board',
-        'function': 'versionchecker.software_functions.ipboard'
+        'module': 'versionchecker.software_functions',
+        'function': 'ipboard'
     },
     'vbulletin': {
         'url': 'http://www.vbulletin.com/forum/external?type=rss2&nodeid=28',
-        'function': 'versionchecker.software_functions.vbulletin'
+        'module': 'versionchecker.software_functions',
+        'function': 'vbulletin'
     },
     'mysql':     {
         'url': 'http://dev.mysql.com/downloads/',
-        'function': 'versionchecker.software_functions.mysql'
+        'module': 'versionchecker.software_functions',
+        'function': 'mysql'
     },
     'lighttpd':  {
         'url': 'http://www.lighttpd.net/download/',
-        'function': 'versionchecker.software_functions.lighttpd'
+        'module': 'versionchecker.software_functions',
+        'function': 'lighttpd'
     },
     'postgre':   {
         'url': 'http://www.postgresql.org/',
-        'function': 'versionchecker.software_functions.postgre'
+        'module': 'versionchecker.software_functions',
+        'function': 'postgre'
     },
     'drupal':    {
         'url': 'https://www.drupal.org/download',
-        'function': 'versionchecker.software_functions.drupal'
+        'module': 'versionchecker.software_functions',
+        'function': 'drupal'
     },
     'tomcat':    {
         'url': 'http://tomcat.apache.org/',
-        'function': 'versionchecker.software_functions.tomcat'
+        'module': 'versionchecker.software_functions',
+        'function': 'tomcat'
     },
+}
+
+version_checking_tools = {
+    'whatweb': {
+        'module': 'parsers',
+        'class': 'WhatWebParser',
+    },
+    'nmap': {
+        'module': 'parsers',
+        'class': 'NMapParser'
+    }
 }
 
 user_agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:31.0) Gecko/20100101 Firefox/31.0 VersionChecker/%s' % version
@@ -96,15 +121,21 @@ try:
         for key in versionchecker_settings.versions_info:
             versions_info[key] = versionchecker_settings.versions_info[key]
 
-    if hasattr(versionchecker_settings, 'joomla_sql_files'): joomla_sql_files = list(set(versionchecker_settings.joomla_sql_files + joomla_sql_files))
+    if hasattr(versionchecker_settings, 'version_checking_tools'): version_checking_tools = versionchecker_settings.version_checking_tools or version_checking_tools
 
 except ImportError:
     stderr.write('%s - settings - versionchecker local settings not found...\n' % str(datetime.now()))
 
 versions_file = '%s/%s.versions' % (tools_folder, tools_name)
-if not os.path.exists(output_folder):
-    try:
-        os.mkdir(output_folder)
-    except OSError:
-        print '\033[91mNo permission to create %s.\033[0m' % output_folder
-        exit(0)
+try:
+    if not os.path.exists(output_folder):
+        os.makedirs(output_folder)
+        print '\033[92mCreated %s\033[0m' % output_folder
+    with open('%s/testfile.tmp' % output_folder, 'w'): pass
+    with open('%s/testfile.tmp' % tools_folder, 'w'): pass
+except OSError:
+    print '\033[1mOne of the following errors occured:\033[0m'
+    print '\033[91mNo permission to create %s\033[0m' % output_folder
+    print '\033[91mNo permission to create a file in %s\033[0m' % output_folder
+    print '\033[91mNo permission to create a file in %s\033[0m' % tools_folder
+    exit(0)
