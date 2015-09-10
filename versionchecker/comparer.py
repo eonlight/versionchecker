@@ -10,7 +10,8 @@ def cve_exists(software, version):
     url = settings.versions_info[software]['cve-search']
     try:
         # this in a while loop
-        pq = PyQuery(requests.get(url).text)
+        html = requests.get(url).text
+        pq = PyQuery(html)
 
         try:
             max_page = len(pq('.paging a'))+1
@@ -21,23 +22,10 @@ def cve_exists(software, version):
 
         for page in range(1, max_page):
 
-            # search page
-            for tr in pq('.listtable tr'):
-                cells = tr.findall('td')
-
-                if len(cells) < 2:
-                    continue
-
-                cve_count = cells[-2].text.strip()
-                cve_version = cells[0].text.strip()
-
-                if settings.DEBUG:
-                    print '%s - comparer - compare_versions - Comparing %s: %s with %s' % (str(datetime.now()), software, cve_version, version)
-
-                if add_zeros(cve_version) == add_zeros(version):
-                    return int(cve_count)
-                elif add_zeros(cve_version) < add_zeros(version):
-                    return False
+            version_link = re.search("/vulnerability-list/.*-{version}\.html".format(version=str(version)), html)
+            if version_link:
+                html = requests.get("http://www.cvedetails.com{path}".format(path=version_link.group())).text
+                return [i.group()[1:-1] for i in re.finditer("/CVE-(\d){4}-(\d)+/", html)]
 
             # get next page
             url = url.replace('/%s/' % str(page), '/%s/' % str(page+1))

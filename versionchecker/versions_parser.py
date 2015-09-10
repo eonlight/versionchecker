@@ -47,7 +47,11 @@ class VersionsParser():
             if settings.DEBUG:
                 print "%s - VersionsParser - update_versions - Updating %s..." % (str(datetime.now()), software)
 
-            response = requests.get(info['url'], verify=False, timeout=10, headers=hs)
+            try:
+                response = requests.get(info['url'], verify=False, timeout=10, headers=hs)
+            except:
+                # Any exceptions will be catch and this will continue
+                continue
 
             if not response:
                 result.update({software: 'request error'})

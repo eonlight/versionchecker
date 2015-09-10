@@ -25,12 +25,16 @@ def printhelp():
     print '    checks the software versions of the given url'
     print '  %s--json url%s' % (bcolors.ENF, bcolors.END)
     print '    checks the software version of the given url and prints the results in json format'
+    print '  %s--cves software version%s' % (bcolors.ENF, bcolors.END)
+    print '    checks if the version is out-of-date and prints the cves related to said version'
     print '  %s--update%s' % (bcolors.ENF, bcolors.END)
     print '    updates the latest versions of all software'
     print '  %s--versions%s' % (bcolors.ENF, bcolors.END)
     print '    prints the latest versions of all the software'
     print '  %s--settings%s' % (bcolors.ENF, bcolors.END)
     print '    prints the settings of VersionChecker and its tools'
+    print '  %s--auth%s' % (bcolors.ENF, bcolors.END)
+    print '    provide basic authentication in the format of user:password'
 
 def merge_results(result, new_result):
     for key in new_result:
@@ -39,7 +43,7 @@ def merge_results(result, new_result):
         elif 'version' in new_result[key] and new_result[key] != '':
             result[key] = new_result[key]
 
-def test(url=None):
+def test(url=None, bauth=None):
     if not url:
         return None
 
@@ -69,7 +73,8 @@ def test(url=None):
 
                 # runs the tool
                 obj = Class(tool=settings.tools_name)
-                merge_results(detected_versions, obj.execute(url))
+                new_detected_versions = obj.execute(url, bauth=bauth)
+                merge_results(detected_versions, new_detected_versions)
 
             except (AttributeError, Exception) as e:
                 if settings.DEBUG:
@@ -92,34 +97,40 @@ def test(url=None):
             stderr.write(traceback.format_exc())
     return None
 
-def run(url):
+def print_results(result):
+    print '--------------------------------------------------------------------------------'
+    print '--------------------------- %sVersionChecker Results%s -----------------------------' % (bcolors.ENF, bcolors.END)
+    print '--------------------------------------------------------------------------------'
+
+    for key in result:
+        print 'Software: %s%s%s' % (bcolors.ENF, key, bcolors.END)
+        print '  Version in use: %s' % result[key]['current']
+        print '  Latest Version: %s' % result[key]['latest']
+
+        if result[key]['cve'] == None:
+            cve = '%sError Getting CVEs%s' % (bcolors.ENF, bcolors.END)
+        elif result[key]['cve'] == False or len(result[key]['cve']) == 0:
+            cve = '%sNot Found%s' % (bcolors.OK, bcolors.END)
+        else:
+            cve = '%sFound %s CVEs%s' % (bcolors.FAIL, len(result[key]['cve']), bcolors.END)
+            cve = '{cve_result}\n    {cves}'.format(cve_result=cve, cves=', '.join(i for i in result[key]['cve']))
+
+        print '  CVEs          : %s' % cve
+        veredict = '  %sVersion not detected%s' % (bcolors.ENF, bcolors.END)
+        if 'nok' == result[key]['result']:
+            veredict = '  %sOut-Of-Date%s' % (bcolors.FAIL, bcolors.END)
+        elif 'ok' == result[key]['result']:
+            veredict = '  %sUp-To-Date%s' % (bcolors.OK, bcolors.END)
+        print veredict
+        print
+
+
+def run(url, bauth=None):
     try:
         scan = 'Scan started at %s' % str(datetime.now())
         print '\n%s %s %s\n' % ( ('-' * ((78 - len(scan))/2)), scan, ('-' * ((78 - len(scan))/2)) )
-        result = test(url)
-        print '--------------------------------------------------------------------------------'
-        print '--------------------------- %sVersionChecker Results%s -----------------------------' % (bcolors.ENF, bcolors.END)
-        print '--------------------------------------------------------------------------------'
-
-        for key in result:
-            print 'Software: %s%s%s' % (bcolors.ENF, key, bcolors.END)
-            print '  Version in use: %s' % result[key]['current']
-            print '  Latest Version: %s' % result[key]['latest']
-
-            cve = '%sFound %s CVEs%s' % (bcolors.FAIL, result[key]['cve'], bcolors.END)
-            if result[key]['cve'] == None:
-                cve = '%sError Getting CVEs%s' % (bcolors.ENF, bcolors.END)
-            elif result[key]['cve'] == False or result[key]['cve'] == 0:
-                cve = '%sNot Found%s' % (bcolors.OK, bcolors.END)
-
-            print '  CVEs          : %s' % cve
-            veredict = '  %sVersion not detected%s' % (bcolors.ENF, bcolors.END)
-            if 'nok' == result[key]['result']:
-                veredict = '  %sOut-Of-Date%s' % (bcolors.FAIL, bcolors.END)
-            elif 'ok' == result[key]['result']:
-                veredict = '  %sUp-To-Date%s' % (bcolors.OK, bcolors.END)
-            print veredict
-            print
+        result = test(url, bauth)
+        print_results(result)
 
         scan = 'Scan ended at %s' % str(datetime.now())
         print '%s %s %s\n' % ( ('-' * ((78 - len(scan))/2)), scan, ('-' * ((78 - len(scan))/2)) )
@@ -133,20 +144,34 @@ def main():
     if '--debug' in argv:
         settings.DEBUG = True
 
+    bauth = None
+    if '--auth' in argv:
+        try:
+            bauth_array = argv[argv.index('--auth') + 1].split(':')
+            bauth = {}
+            bauth['user'] = bauth_array[0]
+            bauth['pass'] = bauth_array[1]
+        except (IndexError, Exception):
+            print 'No auth given'; exit(0)
+
+    if '--help' in argv:
+        printhelp()
+        exit(0)
+
     if '--url' in argv:
         try:
             url = argv[argv.index('--url') + 1]
         except IndexError:
             print 'No url given'; exit(0)
 
-        run(url)
+        run(url, bauth)
 
     elif '--json' in argv:
         try:
             url = argv[argv.index('--json') + 1]
         except IndexError:
             print '%sNo url given.%s' % (bcolors.FAIL, bcolors.END); exit(0)
-        print test(url)
+        print test(url, bauth)
 
     elif '--update' in argv:
         versionsparser = VersionsParser()
@@ -184,8 +209,24 @@ def main():
                     stderr.write('%s - versionchecker - main - Import Error: %s\n' % (str(datetime.now()), e.message))
                     continue
 
+    elif '--cves' in argv:
+        try:
+            software = argv[argv.index('--cves') + 1]
+        except IndexError:
+            print '%sNo software given.%s' % (bcolors.FAIL, bcolors.END); exit(0)
+
+        try:
+            version = argv[argv.index('--cves') + 2]
+        except IndexError:
+            print '%sNo version given.%s' % (bcolors.FAIL, bcolors.END); exit(0)
+
+        versionsparser = VersionsParser()
+        detected_versions = {software: version}
+        result = compare_versions(detected_versions, versionsparser.latest_versions)
+        print_results(result)
+
     elif len(argv) > 1:
-        run(argv[1])
+        run(argv[1], bauth)
 
     else:
         printhelp()

@@ -2,7 +2,7 @@ from sys import path, stderr
 from datetime import datetime
 import os
 
-version = '0.2.0'
+version = '0.2.1'
 
 tools_name = 'versionchecker'
 tools_folder = '%s/.config/audits' % os.getenv("HOME")

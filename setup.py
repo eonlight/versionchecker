@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 from sys import argv
 import os
 
-version = '0.2.0'
+version = '0.2.1'
 home = os.getenv('HOME')
 file_path = os.path.realpath(__file__).rsplit('/', 1)[0]
 
